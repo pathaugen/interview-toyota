@@ -10,3 +10,6 @@
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+
+# Ignore changes to apitoken.go to avoid putting your private api_token in a public repository
+apitoken.go
