@@ -19,6 +19,9 @@ func main() {
   // Display Application Splash
   appSplash()
 
+  // Debug Status
+  debugStatus()
+
   // Webserver Status
   webStatus()
 

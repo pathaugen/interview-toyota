@@ -28,6 +28,19 @@ func appSplash() {
 }
 
 
+// Debug Status
+func debugStatus() {
+  fmt.Print( breakspace + cBold + cCyan + "  Debug Status:" + cClr )
+  fmt.Print( "      [" )
+  if debug {
+    fmt.Print( cBold + cGreen + "DEBUG ON" + cClr )
+  } else {
+    fmt.Print( cBold + cRed + "DEBUG OFF" + cClr )
+  }
+  fmt.Print( "]" + breakspace )
+}
+
+
 // Webserver Status
 func webStatus() {
   fmt.Print( breakspace + cBold + cCyan + "  Webserver Status:" + cClr )
@@ -92,14 +105,59 @@ func handlerStock(w http.ResponseWriter, r *http.Request) {
 
   webserverRequests += 1
 
-  consoleOutput += cBold + cCyan + "Webserver Request" + cClr + " #" + cYellow + strconv.Itoa(webserverRequests) + cClr + breakspace + cBold + cCyan + "Request URL:" + cClr + " http://localhost:" + cClr + cYellow + "PORT" + cClr + "/stock/" + cClr + cYellow + "STOCK" + cClr + "/?stock_exchange=" + cClr + cYellow + "xxx" + cClr + breakspace
+  consoleOutput += cBold + cCyan + "Webserver Request" + cClr + " #" + cYellow + strconv.Itoa(webserverRequests) + cClr
+  consoleOutput += breakspace + cBold + cCyan + "Request URL:" + cClr + " http://localhost:" + cClr + cYellow + "PORT" + cClr + "/stock/" + cClr + cYellow + "STOCK" + cClr + "/?stock_exchange=" + cClr + cYellow + "xxx" + cClr
+  consoleOutput += breakspace + cBold + cCyan + "Response:" + cClr + breakspace
 
   // Set the request URL
-  restUrl := "https://www.worldtradingdata.com/api/v1/stock?symbol=AAPL&stock_exchange=NYSE&api_token=" + apiToken
+  restUrl := "https://www.worldtradingdata.com/api/v1/stock" + "?api_token=" + apiToken + "&symbol=" + "AAPL" + "&stock_exchange=" + "NYSE"
   response, err := http.Get( restUrl )
   if err != nil {
-    consoleOutput += "The HTTP request failed with error:" + breakspace + cRed + err.Error() + cClr
+    consoleOutput += "The HTTP request failed with error:" + breakspace + cRed + err.Error() + cClr + breakspace
   } else {
+    // Example Response:
+    //{
+    //  "symbols_requested": 1,
+    //  "symbols_returned": 1,
+    //  "data": [
+    //    {
+    //      "symbol": "AAPL",
+    //      "name": "Apple Inc.",
+    //      "currency": "USD",
+    //      "price": "154.68",
+    //      "price_open": "156.25",
+    //      "day_high": "158.13",
+    //      "day_low": "154.11",
+    //      "52_week_high": "233.47",
+    //      "52_week_low": "142.00",
+    //      "day_change": "-1.62",
+    //      "change_pct": "-1.04",
+    //      "close_yesterday": "156.30",
+    //      "market_cap": "731605893397",
+    //      "volume": "25718",
+    //      "volume_avg": "42370729",
+    //      "shares": "4729803000",
+    //      "stock_exchange_long": "NASDAQ Stock Exchange",
+    //      "stock_exchange_short": "NASDAQ",
+    //      "timezone": "EST",
+    //      "timezone_name": "America/New_York",
+    //      "gmt_offset": "-18000",
+    //      "last_trade_time": "2019-01-29 16:00:01"
+    //    }
+    //  ]
+    //}
+    // Desired Responses:
+    // symbol
+    // name
+    // price
+    // close_yesterday
+    // currency
+    // market_cap
+    // volume
+    // timezone
+    // timezone_name
+    // gmt_offset
+    // last_trade_time
     data, _ := ioutil.ReadAll(response.Body)
     consoleOutput += string(data)
   }
@@ -109,13 +167,13 @@ func handlerStock(w http.ResponseWriter, r *http.Request) {
   jsonValue, _ := json.Marshal(jsonData)
   response, err = http.Post("https://httpbin.org/post", "application/json", bytes.NewBuffer(jsonValue))
   if err != nil {
-    consoleOutput += "The HTTP request failed with error:" + breakspace + cRed + err.Error() + cClr
+    consoleOutput += "The HTTP request failed with error:" + breakspace + cRed + err.Error() + cClr + breakspace
   } else {
     data, _ := ioutil.ReadAll(response.Body)
     consoleOutput += string(data)
   }
   consoleOutput += breakspace + breakspace
 
-  fmt.Print( consoleOutput )
+  if debug { fmt.Print( consoleOutput ) }
 	fmt.Fprintf( w, webOutput )
 }
